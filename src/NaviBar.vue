@@ -1,0 +1,115 @@
+<template>
+  <header class="main-header">
+    <!-- Logo -->
+    <router-link to="dashboard">
+      <a class="logo">
+        <!-- mini logo for sidebar mini 50x50 pixels -->
+        <span class="logo-mini"><b>O</b>PK</span>
+        <!-- logo for regular state and mobile devices -->
+        <span class="logo-lg"><b>Omnia</b>PK</span>
+      </a>
+    </router-link>
+
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+      <!-- Navbar Right Menu -->
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+          <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <img v-bind:src="'https://api-admin.omniapk.com.br/Upload/User/ImagemPerfil/'+photo" class="user-image" alt="User Image">
+              <span class="hidden-xs">{{ currentUser.name }}</span>
+            </a>
+            <ul class="dropdown-menu">
+              <!-- User image -->
+              <li class="user-header">
+                <img v-bind:src="'https://api-admin.omniapk.com.br/Upload/User/ImagemPerfil/'+photo" class="img-circle" alt="User Image">
+
+                <p>
+                  {{ currentUser.name }}<br>
+                  <small>{{ currentUser.position }}</small>
+                </p>
+              </li>
+              <!-- Menu Body -->
+              
+              <!-- Menu Footer-->
+              <li class="user-footer">
+                <!-- <div class="pull-left">
+                  <a href="/profile" class="btn btn-default btn-flat">Profile</a>
+                </div> -->
+                <div class="pull-left">
+                  <router-link to="profile" class="btn btn-default btn-flat">Profile</router-link>
+                </div>
+                <div class="pull-right">
+                  <a v-on:click="clickBtn" class="btn btn-default btn-flat">Sign out</a>
+                </div>
+              </li>
+            </ul>
+          </li>
+          <!-- Control Sidebar Toggle Button -->
+        </ul>
+      </div>
+    </nav>
+  </header>
+</template>
+
+<script>
+import { mapGetters } from 'vuex'
+
+export default {
+  name: 'va-navibar',
+  data () {
+    return {
+      token: '0',
+      username: '',
+      photo: ''
+    }
+  },
+  mounted () {
+    let vm = this
+    this.token = localStorage.getItem('token')
+    this.username = localStorage.getItem('username')
+    this.$http
+        .post('get-photo', {username: this.username})
+        .then(function (result) {
+          if (result.data) {
+            console.log(result.data)
+            vm.photo = result.data.photo
+          } else {
+            console.log('Error')
+          }
+        })
+  },
+  methods: {
+    clickBtn (e) {
+      e.preventDefault()
+      console.log('submit')
+      this.$http
+        .post('remove-token', {token: this.token})
+        .then(function (result) {
+          console.log(result)
+          if (result.data) {
+            console.log(result.data)
+            localStorage.clear()
+            window.location.href = '/login'
+          } else {
+            console.log('Error')
+          }
+        })
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'unreadMessagesCount',
+      'unreadNotificationsCount',
+      'remainTasksCount',
+      'currentUser'
+    ])
+  }
+}
+
+</script>
